@@ -1,0 +1,170 @@
+INTERLIS 2.3;
+
+/** Minimales Geodatenmodell "Richtpläne der Kantone"
+ * Geobasisdatensatz Nr. 69
+ */
+!!@ technicalContact=mailto:info@are.admin.ch
+!!@ IDGeoIV=69
+!!@ furtherInformation=https://www.are.admin.ch/mmg
+MODEL Richtplaene_V1 (de)
+AT "https://models.geo.admin.ch/ARE/"
+VERSION "2021-06-21"  =
+  IMPORTS NonVector_Base_LV95_V3_1,CHAdminCodes_V1,GeometryCHLV95_V1,LocalisationCH_V1,CatalogueObjectTrees_V1,InternationalCodes_V1;
+
+  STRUCTURE LocalisedUri =
+    Language : InternationalCodes_V1.LanguageCode_ISO639_1;
+    Text : MANDATORY URI;
+  END LocalisedUri;
+
+  STRUCTURE MultilingualUri =
+    LocalisedText : BAG {1..*} OF Richtplaene_V1.LocalisedUri;
+    UNIQUE (LOCAL) LocalisedText:Language;
+  END MultilingualUri;
+
+  STRUCTURE PointStructure =
+    Point : GeometryCHLV95_V1.Coord2;
+  END PointStructure;
+
+  STRUCTURE MultiPoint =
+    Points : BAG {1..*} OF Richtplaene_V1.PointStructure;
+  END MultiPoint;
+
+  TOPIC Richtplaene_CatalogueTrees
+  EXTENDS CatalogueObjectTrees_V1.Catalogues =
+
+    CLASS CoordLevel
+    EXTENDS CatalogueObjectTrees_V1.Catalogues.Item =
+      CoordLevelID : MANDATORY 1 .. 99;
+      CoordLevelName : MANDATORY LocalisationCH_V1.MultilingualText;
+      UNIQUE CoordLevelID;
+    END CoordLevel;
+
+    CLASS Source
+    EXTENDS CatalogueObjectTrees_V1.Catalogues.Item =
+      SourceID : MANDATORY 1 .. 99;
+      SourceName : MANDATORY LocalisationCH_V1.MultilingualText;
+      UNIQUE SourceID;
+    END Source;
+
+    CLASS Theme
+    EXTENDS CatalogueObjectTrees_V1.Catalogues.Item =
+      ThemeID : MANDATORY 1 .. 9999;
+      ThemeName : MANDATORY LocalisationCH_V1.MultilingualText;
+      UNIQUE ThemeID;
+    END Theme;
+
+    STRUCTURE CoordLevel_CatRef
+    EXTENDS CatalogueObjectTrees_V1.Catalogues.CatalogueReference =
+      Reference (EXTENDED) : MANDATORY REFERENCE TO (EXTERNAL) Richtplaene_V1.Richtplaene_CatalogueTrees.CoordLevel;
+    END CoordLevel_CatRef;
+
+    STRUCTURE Source_CatRef
+    EXTENDS CatalogueObjectTrees_V1.Catalogues.CatalogueReference =
+      Reference (EXTENDED) : MANDATORY REFERENCE TO (EXTERNAL) Richtplaene_V1.Richtplaene_CatalogueTrees.Source;
+    END Source_CatRef;
+
+    STRUCTURE Theme_CatRef
+    EXTENDS CatalogueObjectTrees_V1.Catalogues.CatalogueReference =
+      Reference (EXTENDED) : MANDATORY REFERENCE TO (EXTERNAL) Richtplaene_V1.Richtplaene_CatalogueTrees.Theme;
+    END Theme_CatRef;
+
+  END Richtplaene_CatalogueTrees;
+
+  TOPIC Rasterdaten(ABSTRACT)
+  EXTENDS NonVector_Base_LV95_V3_1.NonVector =
+    DEPENDS ON Richtplaene_V1.Richtplaene_CatalogueTrees;
+
+    CLASS RichtplaeneDataset
+    EXTENDS NonVector_Base_LV95_V3_1.NonVector.NonVector_Dataset =
+      Titel : MANDATORY TEXT*60;
+      Kartentyp : MANDATORY Richtplaene_V1.Richtplaene_CatalogueTrees.Source_CatRef;
+      Massstab : MANDATORY 25000 .. 1000000;
+      Kanton : MANDATORY CHAdminCodes_V1.CHCantonCode;
+      Datum_Beschluss : MANDATORY FORMAT INTERLIS.XMLDate "1900-1-1" .. "2099-12-31";
+      Datum_Genehmigung : FORMAT INTERLIS.XMLDate "1990-1-1" .. "2099-12-31";
+      Weblink : MANDATORY Richtplaene_V1.MultilingualUri;
+      Legende : MANDATORY Richtplaene_V1.MultilingualUri;
+      Bemerkung : MTEXT;
+    END RichtplaeneDataset;
+
+    CLASS RichtplaeneRasterObject
+    EXTENDS NonVector_Base_LV95_V3_1.NonVector.ImageGraphicRasterObject =
+      Bildformat : MANDATORY TEXT*10;
+      Aufloesung_dpi : MANDATORY 200 .. 2400;
+    END RichtplaeneRasterObject;
+
+  END Rasterdaten;
+
+  TOPIC Vektordaten =
+    DEPENDS ON Richtplaene_V1.Richtplaene_CatalogueTrees;
+
+    CLASS Objekt (ABSTRACT) =
+      Code : MANDATORY TEXT*25;
+      Originalbezeichnung : MANDATORY TEXT*200;
+      Abkuerzung : TEXT*25;
+      Kapitel : TEXT*200;
+      Thema : MANDATORY Richtplaene_V1.Richtplaene_CatalogueTrees.Theme_CatRef;
+      Koordinationsstand : MANDATORY Richtplaene_V1.Richtplaene_CatalogueTrees.CoordLevel_CatRef;
+      Quelle : MANDATORY Richtplaene_V1.Richtplaene_CatalogueTrees.Source_CatRef;
+      Vorhaben : BOOLEAN;
+      Positivplanung : BOOLEAN;
+      Negativplanung : BOOLEAN;
+      Datum_Beschluss : MANDATORY FORMAT INTERLIS.XMLDate "1900-1-1" .. "2099-12-31";
+      Kanton : CHAdminCodes_V1.CHCantonCode;
+      Weblink : Richtplaene_V1.MultilingualUri;
+      Bemerkung : MTEXT;
+      MANDATORY CONSTRAINT NOT (
+      (Vorhaben == #true AND Positivplanung == #true) OR
+      (Vorhaben == #true AND Negativplanung == #true) OR
+      (Positivplanung == #true AND Negativplanung == #true)
+      );
+    END Objekt;
+
+    CLASS Linie
+    EXTENDS Objekt =
+      Geometrie : MANDATORY GeometryCHLV95_V1.MultiLine;
+    END Linie;
+
+    CLASS Punkt
+    EXTENDS Objekt =
+      Geometrie : MANDATORY Richtplaene_V1.MultiPoint;
+    END Punkt;
+
+    CLASS Flaeche
+    EXTENDS Objekt =
+      Geometrie : MANDATORY GeometryCHLV95_V1.MultiSurface;
+    END Flaeche;
+
+  END Vektordaten;
+
+  TOPIC Metadaten =
+    DEPENDS ON Richtplaene_V1.Richtplaene_CatalogueTrees;
+
+    CLASS Amt =
+      Name : MANDATORY LocalisationCH_V1.MultilingualText;
+      AmtImWeb : Richtplaene_V1.MultilingualUri;
+      UID : TEXT*12;
+    END Amt;
+
+    CLASS Quelle_Thema =
+      Quelle : MANDATORY Richtplaene_V1.Richtplaene_CatalogueTrees.Source_CatRef;
+      Thema : MANDATORY Richtplaene_V1.Richtplaene_CatalogueTrees.Theme_CatRef;
+      Massstab : MANDATORY 25000 .. 1000000;
+      Bemerkung : MTEXT;
+    END Quelle_Thema;
+
+    CLASS Datenbestand =
+      BasketID : MANDATORY TEXT*20;
+      Stand : MANDATORY INTERLIS.XMLDate;
+      Lieferdatum : INTERLIS.XMLDate;
+      Bemerkung : MTEXT;
+    END Datenbestand;
+
+    ASSOCIATION zustStelle_Daten =
+      zustaendigeStelle -<> {1} Amt;
+      Datenbestand -- {0..*} Datenbestand;
+    END zustStelle_Daten;
+
+  END Metadaten;
+
+END Richtplaene_V1.

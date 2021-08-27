@@ -1,0 +1,37 @@
+Info: ili2pg-4.4.1-e9ddc1895e1a7f13ff029644af1442ddb79dcaa4
+Info: ili2c-5.1.1-20200501
+Info: iox-ili-1.21.0-731076775d8b9bd0599802cf5a0324bc3a1c21d8
+Info: java.version 11.0.9
+Info: user.name <stefan>
+Info: maxMemory 524288 KB
+Info: currentTime 2021-08-27 14:29:35
+Info: dbschema <arp_richtplan_mgdm>
+Info: databaseProduct <PostgreSQL>
+Info: databaseVersion <13.3 (Debian 13.3-1.pgdg100+1)>
+Info: driverName <PostgreSQL JDBC Driver>
+Info: driverVersion <42.2.5>
+Info: postGISVersion <POSTGIS="3.1.2 cbe925d" [EXTENSION] PGSQL="130" GEOS="3.7.1-CAPI-1.11.1 27a5e771" PROJ="Rel. 5.2.0, September 15th, 2018" LIBXML="2.9.4" LIBJSON="0.12.1" LIBPROTOBUF="1.3.1" WAGYU="0.5.0 (Internal)">
+Info: compile models...
+Info: lookup model <Richtplaene_V1> in repository <https://models.geo.admin.ch/>
+Info: lookup model <Richtplaene_V1> in repository <../MGDM_Richtplaene_PlansDirecteurs/>
+Info: lookup model <GeometryCHLV95_V1> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <CHAdminCodes_V1> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <NonVector_Base_LV95_V3_1> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <InternationalCodes_V1> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <CatalogueObjectTrees_V1> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <CoordSys> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <CoordSys> 2.3 in repository <../MGDM_Richtplaene_PlansDirecteurs/>
+Info: lookup model <CoordSys> 2.3 in repository <http://models.interlis.ch/>
+Info: lookup model <Units> 2.3 in repository <https://models.geo.admin.ch/>
+Info: lookup model <Units> 2.3 in repository <../MGDM_Richtplaene_PlansDirecteurs/>
+Info: lookup model <Units> 2.3 in repository <http://models.interlis.ch/>
+Info: ilifile </Users/stefan/.ilicache/models.interlis.ch/refhb23/CoordSys-20151124.ili>
+Info: ilifile </Users/stefan/.ilicache/models.interlis.ch/refhb23/Units-20120220.ili>
+Info: ilifile </Users/stefan/.ilicache/models.geo.admin.ch/CH/CHBase_Part2_LOCALISATION_V1.ili>
+Info: ilifile </Users/stefan/.ilicache/models.geo.admin.ch/CH/CHBase_Part3_CATALOGUEOBJECTS_V1.ili>
+Info: ilifile </Users/stefan/.ilicache/models.geo.admin.ch/CH/CHBase_Part1_GEOMETRY_V1.ili>
+Info: ilifile </Users/stefan/.ilicache/models.geo.admin.ch/CH/CHBase_Part4_ADMINISTRATIVEUNITS_V1.ili>
+Info: ilifile </Users/stefan/.ilicache/models.geo.admin.ch/CH/NonVector_Base_V3_1.ili>
+Info: ilifile <../MGDM_Richtplaene_PlansDirecteurs/Richtplaene_V1.ili>
+Info: create table structure, if not existing...
+Info: ...done

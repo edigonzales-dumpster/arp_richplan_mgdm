@@ -1,0 +1,74 @@
+import ch.so.agi.gretl.tasks.*
+import ch.so.agi.gretl.api.*
+
+apply plugin: 'ch.so.agi.gretl'
+
+buildscript {
+    repositories {
+        maven { url "http://jars.interlis.ch" }
+        maven { url "http://jars.umleditor.org" }
+        maven { url "https://repo.osgeo.org/repository/release/" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'ch.so.agi', name: 'gretl',  version: '2.1.+'
+    }
+}
+
+defaultTasks 'validate'
+
+def dbUriEdit = "jdbc:postgresql://localhost:54321/edit";
+def dbUserEdit = "gretl";
+def dbPwdEdit = "gretl";
+
+
+task createSchema(type: Ili2pgImportSchema){
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = "Richtplaene_V1"
+    modeldir = "https://models.geo.admin.ch;../MGDM_Richtplaene_PlansDirecteurs"
+    dbschema = "arp_richtplan_mgdm"
+    createTidCol = true
+    strokeArcs = true
+    defaultSrsCode = 2056
+    nameByTopic = true
+    logFile = "ili2pg.log"
+}
+
+task importCatalog(type: Ili2pgImport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    models = "Richtplaene_V1"
+    modeldir = "https://models.geo.admin.ch;../MGDM_Richtplaene_PlansDirecteurs"
+    dbschema = "arp_richtplan_mgdm"
+    dataFile = "../MGDM_Richtplaene_PlansDirecteurs/Richtplaene_CatalogueTrees_V1.xml"
+    importTid = true
+}
+
+task createGpkgTables(type: SqlExecutor) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    sqlFiles = ['create_tables.sql']
+}
+
+task importGpkgData_Flaeche(type: GpkgImport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    schemaName = "gpkg"
+    srcTableName = "Flaeche"
+    dstTableName = "flaeche"
+    dataFile = "../MGDM_RP_Testdaten/MGDM_RP_Testdaten.gpkg"
+}
+
+task importGpkgData_Linie(type: GpkgImport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    schemaName = "gpkg"
+    srcTableName = "Linie"
+    dstTableName = "linie"
+    dataFile = "../MGDM_RP_Testdaten/MGDM_RP_Testdaten.gpkg"
+}
+
+task importGpkgData_Punkt(type: GpkgImport) {
+    database = [dbUriEdit, dbUserEdit, dbPwdEdit]
+    schemaName = "gpkg"
+    srcTableName = "Punkt"
+    dstTableName = "punkt"
+    dataFile = "../MGDM_RP_Testdaten/MGDM_RP_Testdaten.gpkg"
+}
